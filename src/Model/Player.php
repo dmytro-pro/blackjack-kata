@@ -23,6 +23,19 @@ class Player extends Model
         return PlayerCard::query()
             ->where(['player_id' => $this->id])
             ->where(['game_id' => $gameId])
+            ->where(['is_hidden' => 0])
+            ->get();
+    }
+
+    /**
+     * @param int $gameId
+     * @return \Illuminate\Database\Eloquent\Collection|PlayerCard[]
+     */
+    public function getAllGameCards(int $gameId)
+    {
+        return PlayerCard::query()
+            ->where(['player_id' => $this->id])
+            ->where(['game_id' => $gameId])
             ->get();
     }
 }

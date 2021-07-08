@@ -61,6 +61,9 @@ class BlackJackController
 
     public function newGame()
     {
+        /** @var Player $player */
+        $player = Auth::guard('player')->user();
+
         PlayerCard::query()->where('game_id', 1)->delete();
 
         $cards = Card::query()->get();
@@ -89,6 +92,12 @@ class BlackJackController
             'status' => 'OK',
             'caption' => 'New game started',
             'game_id' => 1,
+            'player_cards' => $player->getGameCards($game->id)->map(function (PlayerCard $playerCard) {
+                return $playerCard->card;
+            })->toArray(),
+            'bank_visible_cards' => $game->bankPlayer->getGameCards($game->id)->map(function (PlayerCard $playerCard) {
+                return $playerCard->card;
+            })->toArray(),
         ];
     }
 
@@ -115,6 +124,9 @@ class BlackJackController
                 'caption' => 'Player is bust',
                 'player_points_count' => $this->pointsCalculator->calculatePoints($player->getGameCards($game->id)),
                 'game_id' => 1,
+                'player_cards' => $player->getGameCards($game->id)->map(function (PlayerCard $playerCard) {
+                    return $playerCard->card;
+                })->toArray(),
             ];
         } catch (NoCardsLeftException $exception) {
             return [
@@ -122,10 +134,12 @@ class BlackJackController
                 'caption' => 'No Cards Left to hit, use Stand strategy instead',
                 'player_points_count' => $this->pointsCalculator->calculatePoints($player->getGameCards($game->id)),
                 'game_id' => 1,
+                'player_cards' => $player->getGameCards($game->id)->map(function (PlayerCard $playerCard) {
+                    return $playerCard->card;
+                })->toArray(),
             ];
         }
     }
-
 
     public function stand()
     {
@@ -143,6 +157,9 @@ class BlackJackController
                 'caption' => 'Good to go',
                 'player_points_count' => $this->pointsCalculator->calculatePoints($player->getGameCards($game->id)),
                 'game_id' => 1,
+                'player_cards' => $player->getGameCards($game->id)->map(function (PlayerCard $playerCard) {
+                    return $playerCard->card;
+                })->toArray(),
             ];
         } catch (BustException $exception) {
             return [
@@ -150,11 +167,14 @@ class BlackJackController
                 'caption' => 'Player is bust',
                 'player_points_count' => $this->pointsCalculator->calculatePoints($player->getGameCards($game->id)),
                 'game_id' => 1,
+                'player_cards' => $player->getGameCards($game->id)->map(function (PlayerCard $playerCard) {
+                    return $playerCard->card;
+                })->toArray(),
             ];
         }
     }
 
-    public function showMyPoints()
+    public function showMyScore()
     {
         /** @var Player $player */
         $player = Auth::guard('player')->user();
@@ -170,6 +190,9 @@ class BlackJackController
                 'caption' => 'Good to go',
                 'player_points_count' => $this->pointsCalculator->calculatePoints($player->getGameCards($game->id)),
                 'game_id' => 1,
+                'player_cards' => $player->getGameCards($game->id)->map(function (PlayerCard $playerCard) {
+                    return $playerCard->card;
+                })->toArray(),
             ];
         } catch (BustException $exception) {
             return [
@@ -177,11 +200,14 @@ class BlackJackController
                 'caption' => 'Player is bust',
                 'player_points_count' => $this->pointsCalculator->calculatePoints($player->getGameCards($game->id)),
                 'game_id' => 1,
+                'player_cards' => $player->getGameCards($game->id)->map(function (PlayerCard $playerCard) {
+                    return $playerCard->card;
+                })->toArray(),
             ];
         }
     }
 
-    public function showBankPoints()
+    public function showBankScore()
     {
         /** @var Player $player */
         $player = Auth::guard('player')->user();
@@ -195,15 +221,21 @@ class BlackJackController
             return [
                 'status' => 'OK',
                 'caption' => 'Good to go',
-                'bank_points_count' => $this->pointsCalculator->calculatePoints($player->getGameCards($game->id)),
+                'bank_visible_points_count' => $this->pointsCalculator->calculatePoints($player->getGameCards($game->id)),
                 'game_id' => 1,
+                'bank_visible_cards' => $game->bankPlayer->getGameCards($game->id)->map(function (PlayerCard $playerCard) {
+                    return $playerCard->card;
+                })->toArray(),
             ];
         } catch (BustException $exception) {
             return [
                 'status' => 'BUST',
                 'caption' => 'Bank is bust',
-                'bank_points_count' => $this->pointsCalculator->calculatePoints($player->getGameCards($game->id)),
+                'bank_visible_points_count' => $this->pointsCalculator->calculatePoints($player->getGameCards($game->id)),
                 'game_id' => 1,
+                'bank_visible_cards' => $game->bankPlayer->getGameCards($game->id)->map(function (PlayerCard $playerCard) {
+                    return $playerCard->card;
+                })->toArray(),
             ];
         }
     }

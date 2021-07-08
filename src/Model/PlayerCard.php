@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  *
  * @property Game game
  * @property Player player
+ * @property Card card
  */
 class PlayerCard extends Model
 {
@@ -30,5 +31,10 @@ class PlayerCard extends Model
     public function player(): BelongsTo
     {
         return $this->belongsTo(Player::class, 'player_id');
+    }
+
+    public function card(): BelongsTo
+    {
+        return $this->belongsTo(Player::class, 'card_id');
     }
 }
